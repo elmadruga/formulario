@@ -4,7 +4,9 @@
             <div class="col-6 bg-light">
                 <span class="fs-4">ENTRADA DE DADOS</span>
                 <hr>
-                <form>
+                <!--<form @submit.prevent="enviar($event)">--->
+                    <div>
+                    <!--<form @reset.prevent="resetar()">-->
                     <div class="mb-3 row">
                         <label class="col-3 col-form-label">Nome:</label>
                         <div class="col">
@@ -131,7 +133,7 @@
                     <div class="mb-3 row">
                         <label class="col-3 col-form-label">Placa Veículo Mercosul:</label>
                         <div class="col">
-                            <input type="text" class="form-control" v-model="form.plavaVeiculoMersocul" v-maska="'AAA-#A##'">
+                            <input type="text" class="form-control" v-model="form.placaVeiculoMersocul" v-maska="'AAA-#A##'">
                             <small class="text-muted">Formato: 0000 0000 0000 0000</small>
                         </div>
                     </div>
@@ -203,16 +205,39 @@
                             <textarea class="form-control" rows="3" v-model="form.descricao"></textarea>
                         </div>
                     </div>
+                    <div class="mb-3 row">
+                        <label class="col-3 col-form-label">Cursos:</label>
+                        <div class="col">
+                            <select class="form-select" v-model="form.curso">
+                                <option value="" disabled>-- Selecione uma opção</option>
+                                <option 
+                                    v-for="curso in cursos" 
+                                    :key="curso.id"
+                                    :value="curso.id"
+                                >
+                                    {{ curso.id }} - {{ curso.curso }}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <label class="col-3 col-form-label">Avaliação:</label>
+                        <div class="col">
+                            <!-- <input-estrelas :numero-estrelas="5" @avaliar="form.avaliacao = $event"/> -->
+                            <input-estrelas :numero-estrelas="5" v-model:avaliar="form.avaliacao" />
+                        </div>
+                    </div>
                     <hr>
                     <div class="mb-3 row">
                         <div class="col d-flex justify-content-between">
-                            <button class="btn btn-secondary" type="reset">Limpar</button>
-                            <button class="btn btn-success" type="button">Enviar (btn)</button>
+                            <button class="btn btn-secondary" type="reset" @click="resetar()">Limpar</button>
+                            <button class="btn btn-success" type="button" @click="enviar()">Enviar (btn)</button>
                             <button class="btn btn-success" type="submit">Enviar (submit)</button>
                         </div>                        
                     </div>
-                   
-                </form>
+                <!--</form>-->
+            
+                </div>
             </div>
 
             
@@ -268,7 +293,7 @@
                     <span>Placa veículo: {{ form.placaVeiculo }}</span>
                 </div>
                 <div class="mb-3 row">
-                    <span>Placa veículo Mercosul: {{ form.plavaVeiculoMersocul }}</span>
+                    <span>Placa veículo Mercosul: {{ form.placaVeiculoMersocul }}</span>
                 </div>
                 <div class="mb-3 row">
                     <span>RG: {{ form.rg }}</span>
@@ -312,7 +337,13 @@
                 <div class="mb-3 row">
                     <span>Descrição:</span>
                     <pre>{{ form.descricao }}</pre>
-                </div> 
+                </div>
+                <div class="mb-3 row">
+                    <span>Curso: {{ form.curso }}</span>
+                </div>
+                <div class="mb-3 row">
+                    <span>Avaliação: {{ form.avaliacao }}</span>
+                </div>
             </div>
         </div>
 
@@ -321,12 +352,22 @@
 </template>
 
 <script>
-
+import InputEstrelas from '@/components/InputEstrelas.vue'
 
 export default {
+    components: {
+        InputEstrelas
+    },
     name: 'FormularioPadrao',
     data: () => ({
-        form: {
+        cursos: [
+            { id: 1, curso: 'Banco de dados relacionais' },
+            { id: 2, curso: 'Desenvolvimento web avançado com Vue' },
+            { id: 3, curso: 'Desenvolvimento web avançado com Laravel' },
+            { id: 4, curso: 'Curso completo do desenvolvedor NodeJs e MongoDb' }
+        ],
+        form: {},
+        formEstadoInicial: {
             nome: '',
             email: '',
             senha: '',
@@ -339,7 +380,7 @@ export default {
             cnpj: '',
             cartaoDeCredito: '',
             placaVeiculo: '',
-            plavaVeiculoMersocul: '',
+            placaVeiculoMersocul: '',
             rg: '',
             data: '',
             dataHoraLocal: '',
@@ -350,13 +391,30 @@ export default {
             alcance: 5,
             escondido: 'Esse é um input escondido',
             arquivos: {},
-            descricao: ''
+            descricao: '',
+            curso: '',
+            avaliacao: 0
         }
     }),
+    created() {
+            this.resetar()
+        },
     methods: {
         selecionarArquivos(event) {
             //console.log(event.target.files)
             this.form.arquivos = event.target.files
+        },
+        enviar() {
+            //console.log(e)
+
+            const formEnvio = Object.assign({}, this.form)
+            console.log(formEnvio)
+
+            //uma requisição http para o backend da aplicação
+            //promisse que vai nos permitir tomar ações se a requisição deu certo ou errado
+        },
+        resetar() {
+            this.form = Object.assign({}, this.formEstadoInicial)
         }
     }
 }
